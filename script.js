@@ -1,7 +1,7 @@
 const container = document.querySelector("#container");
 let mouseDown = false;
 
-document.addEventListener("mousedown", () => {
+container.addEventListener("mousedown", () => {
     mouseDown = true;
 });
 
@@ -14,6 +14,55 @@ document.addEventListener("dragstart", (e) => {
     e.preventDefault();
 });
 
+let mode = "black"
+
+const blackButton = document.querySelector("#black");
+const rainbowButton = document.querySelector("#rainbow");
+const darkenButton = document.querySelector("#darken");
+
+blackButton.addEventListener("click", () => {
+    mode = "black";
+});
+
+rainbowButton.addEventListener("click", () => {
+    mode = "rainbow";
+});
+
+darkenButton.addEventListener("click", () => {
+    mode = "darken";
+});
+
+function randomColor() {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+function colourSquare(grid) {
+    if(mode === "black")
+    {
+        grid.style.backgroundColor = "black";
+    }
+
+    else if(mode === "rainbow")
+    {
+        grid.style.backgroundColor = randomColor();
+    }
+
+    else if(mode === "darken")
+    {
+        let opacity = Number(grid.dataset.opacity);
+
+        opacity += 0.1;
+
+        grid.dataset.opacity = opacity;
+
+        grid.style.backgroundColor = `rgba(0,0,0,${opacity})`;
+    }
+}
+
 function createGrid(size) {
     const squareSize = 640 / size;
 
@@ -22,18 +71,21 @@ function createGrid(size) {
         const grid = document.createElement("div")
         grid.classList.add("grid");
 
+        grid.dataset.opacity = 0;
+
         grid.style.width = `${squareSize}px`;
-        grid.style.heigth = `${squareSize}px`;
+        grid.style.height = `${squareSize}px`;
+        grid.style.backgroundColor = "white";
 
         grid.addEventListener("mouseover", () => {
             if(mouseDown)
             {
-                grid.style.backgroundColor = "black";
+                colourSquare(grid);
             }
         });
 
         grid.addEventListener("mousedown", () => {
-            grid.style.backgroundColor = "black";
+            colourSquare(grid);
         });
         
         container.appendChild(grid);
@@ -65,6 +117,17 @@ function changeSize() {
         createGrid(size);
     }
 }
+
+const reset = document.querySelector("#reset");
+
+reset.addEventListener("click", () => {
+    const squares = document.querySelectorAll(".grid");
+
+    squares.forEach(square => {
+        square.style.backgroundColor = "white";
+        square.dataset.opacity = 0;
+    });
+});
 
 const resize = document.querySelector("#resize");
 
